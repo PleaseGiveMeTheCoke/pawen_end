@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: sysgateway
+  redis:
+    host: 139.196.157.116
+    port: 6379
+  cloud:
+    gateway:
+      globalcors: #解决跨域请求问题
+        corsConfigurations:
+          '[/**]':
+            allowCredentials: true
+            allowedHeaders: '*'
+            allowedMethods: '*'
+            allowedOrigins: '*'
+
+      routes:
+        - id: cutword
+          uri: lb://cutword
+          predicates:
+            - Path=/Gcutword/**
+          filters:
+            - StripPrefix= 1
+        - id: save
+          uri: lb://save
+          predicates:
+            - Path=/Gsave/**
+          filters:
+            - StripPrefix= 1
+            - name: RequestRateLimiter #请求数限流 名字不能随便写
+              args:
+                key-resolver: "#{@ipKeyResolver}"
+                redis-rate-limiter.replenishRate: 1 #令牌桶每秒填充平均速率
+                redis-rate-limiter.burstCapacity: 1 #令牌桶总容量
+        - id: login
+          #如果带lb,会路由到uri的服务上
+          #否则,路由到uri上
+          uri: lb://login
+          predicates:
+            - Path=/Glogin/**
+          filters:
+            - StripPrefix= 1
+server:
+  port: 7788
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:6868/eureka
+  instance:
+    prefer-ip-address: true

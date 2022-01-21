@@ -1,0 +1,14 @@
+server:
+  port: 6866
+spring:
+  application:
+    name: LOGIN
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/pawen?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: w15038145966
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:6868/eureka
